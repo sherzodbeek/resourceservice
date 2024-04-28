@@ -57,7 +57,7 @@ public class ResourceServiceImpl implements ResourceService {
         SongMetadataDTO songMetadata = getSongMetadata(file);
 
         savedFile = resourceRepository.save(
-                new Resource(songMetadata.getName(), file));
+                new Resource(songMetadata.getArtist() + "-" + songMetadata.getName(), file));
 
         songMetadata.setResourceId(savedFile.getId());
         sendMetaDataToSongService(songMetadata);
