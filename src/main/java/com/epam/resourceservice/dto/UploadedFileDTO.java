@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UploadedFileDTO {
 
-    Long id;
+    Integer id;
 }
 

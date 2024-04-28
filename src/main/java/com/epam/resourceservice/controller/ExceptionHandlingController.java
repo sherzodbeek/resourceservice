@@ -1,11 +1,11 @@
 package com.epam.resourceservice.controller;
 
-import com.epam.resourceservice.exception.NotValidFileTypeException;
 import com.epam.resourceservice.exception.ResourceNotFoundException;
 import com.epam.resourceservice.exception.SongServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -29,8 +29,8 @@ public class ExceptionHandlingController {
                 .body(ex.getMessage());
     }
 
-    @ExceptionHandler(NotValidFileTypeException.class)
-    public ResponseEntity<String> invalidFileType(NotValidFileTypeException ex) {
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<String> invalidFileType(HttpMediaTypeNotSupportedException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());

@@ -13,5 +13,5 @@ import java.util.List;
 @Builder
 public class DeletedFilesDTO {
 
-    List<Long> ids;
+    List<Integer> ids;
 }

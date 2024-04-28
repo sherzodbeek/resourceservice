@@ -1,15 +1,14 @@
 package com.epam.resourceservice.controller;
 
-import com.epam.resourceservice.model.DownloadFileModel;
 import com.epam.resourceservice.dto.DeletedFilesDTO;
 import com.epam.resourceservice.dto.UploadedFileDTO;
+import com.epam.resourceservice.model.DownloadFileModel;
 import com.epam.resourceservice.service.ResourceService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,14 +22,14 @@ public class ResourceController {
         this.service = service;
     }
 
-    @PostMapping
-    public ResponseEntity<UploadedFileDTO> uploadFile(MultipartFile file) {
+    @PostMapping(consumes = "audio/mpeg")
+    public ResponseEntity<UploadedFileDTO> uploadFile(@RequestBody byte[] file) {
         UploadedFileDTO upload = service.upload(file);
         return ResponseEntity.ok(upload);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long id) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable Integer id) {
         DownloadFileModel fileModel = service.download(id);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, fileModel.getContentType())
@@ -39,7 +38,7 @@ public class ResourceController {
     }
 
     @DeleteMapping
-    public ResponseEntity<DeletedFilesDTO> deleteFile(@RequestParam("id") List<Long> ids) {
+    public ResponseEntity<DeletedFilesDTO> deleteFile(@RequestParam("id") String ids) {
         DeletedFilesDTO deletedFilesDTO = service.deleteFiles(ids);
         return ResponseEntity.ok().body(deletedFilesDTO);
     }

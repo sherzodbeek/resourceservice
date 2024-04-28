@@ -11,6 +11,6 @@ public class SongMetadataDTO {
     private String artist;
     private String album;
     private String length;
-    private Long resourceId;
+    private Integer resourceId;
     private String year;
 }

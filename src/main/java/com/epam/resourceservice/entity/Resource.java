@@ -14,7 +14,7 @@ public class Resource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    Integer id;
 
     @Column(name = "name")
     String name;
