@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  resourceservice:
+    build:
+      context: ./resourceservice
+    container_name: resourceservice
+    depends_on:
+      - resourceservicedb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://resourceservicedb:$RESOURCE_SERVICE_PORT/$RESOURCE_SERVICE_DB
+      - SPRING_DATASOURCE_USERNAME=$RESOURCE_SERVICE_DB_USER
+      - SPRING_DATASOURCE_PASSWORD=$RESOURCE_SERVICE_DB_PASSWORD
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SONG_SERVICE_NAME=song-service
+      - SONG_SERVICE_URL=http://songservice:$SONG_SERVICE_DOCKER_PORT/$SONG_SERVICE_API
+    ports:
+      - $RESOURCE_SERVICE_LOCAL_PORT:$RESOURCE_SERVICE_DOCKER_PORT
+    networks:
+      - app-network
+
+  songservice:
+    build:
+      context: ./songservice
+    container_name: songservice
+    depends_on:
+      - songservicedb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://songservicedb:$SONG_SERVICE_PORT/$SONG_SERVICE_DB
+      - SPRING_DATASOURCE_USERNAME=$SONG_SERVICE_DB_USER
+      - SPRING_DATASOURCE_PASSWORD=$SONG_SERVICE_DB_PASSWORD
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - $SONG_SERVICE_LOCAL_PORT:$SONG_SERVICE_DOCKER_PORT
+    networks:
+      - app-network
+
+  resourceservicedb:
+    image: 'postgres:16-alpine'
+    container_name: resourceservicedb
+    environment:
+      - POSTGRES_USER=$RESOURCE_SERVICE_DB_USER
+      - POSTGRES_PASSWORD=$RESOURCE_SERVICE_DB_PASSWORD
+    volumes:
+      - ./resourceservice/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  songservicedb:
+    image: 'postgres:16-alpine'
+    container_name: songservicedb
+    environment:
+      - POSTGRES_USER=$SONG_SERVICE_DB_USER
+      - POSTGRES_PASSWORD=$SONG_SERVICE_DB_PASSWORD
+    volumes:
+      - ./songservice/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+networks:
+  app-network:
