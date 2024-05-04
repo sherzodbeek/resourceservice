@@ -7,13 +7,13 @@ services:
     container_name: resourceservice
     depends_on:
       - resourceservicedb
+      - eurekaserver
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://resourceservicedb:$RESOURCE_SERVICE_PORT/$RESOURCE_SERVICE_DB
       - SPRING_DATASOURCE_USERNAME=$RESOURCE_SERVICE_DB_USER
       - SPRING_DATASOURCE_PASSWORD=$RESOURCE_SERVICE_DB_PASSWORD
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SONG_SERVICE_NAME=song-service
-      - SONG_SERVICE_URL=http://songservice:$SONG_SERVICE_DOCKER_PORT/$SONG_SERVICE_API
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka
     ports:
       - $RESOURCE_SERVICE_LOCAL_PORT:$RESOURCE_SERVICE_DOCKER_PORT
     networks:
@@ -25,13 +25,33 @@ services:
     container_name: songservice
     depends_on:
       - songservicedb
+      - eurekaserver
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://songservicedb:$SONG_SERVICE_PORT/$SONG_SERVICE_DB
       - SPRING_DATASOURCE_USERNAME=$SONG_SERVICE_DB_USER
       - SPRING_DATASOURCE_PASSWORD=$SONG_SERVICE_DB_PASSWORD
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka
     ports:
       - $SONG_SERVICE_LOCAL_PORT:$SONG_SERVICE_DOCKER_PORT
+    networks:
+      - app-network
+
+  songservice2:
+    build:
+      context: ./songservice
+    container_name: songservice2
+    depends_on:
+      - songservicedb
+      - eurekaserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://songservicedb:$SONG_SERVICE_PORT/$SONG_SERVICE_DB
+      - SPRING_DATASOURCE_USERNAME=$SONG_SERVICE_DB_USER
+      - SPRING_DATASOURCE_PASSWORD=$SONG_SERVICE_DB_PASSWORD
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka
+    ports:
+      - $SONG_SERVICE_LOCAL_PORT_2:$SONG_SERVICE_DOCKER_PORT
     networks:
       - app-network
 
@@ -54,6 +74,15 @@ services:
       - POSTGRES_PASSWORD=$SONG_SERVICE_DB_PASSWORD
     volumes:
       - ./songservice/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  eurekaserver:
+    build:
+      context: ./eurekaserver
+    container_name: eurekaserver
+    ports:
+      - $EUREKA_SERVER_LOCAL_PORT:$EUREKA_SERVER_DOCKER_PORT
     networks:
       - app-network
 
