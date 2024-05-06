@@ -6,9 +6,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(value = "${SONG_SERVICE_NAME}", url = "${SONG_SERVICE_URL}")
+@FeignClient(value = "song-service")
 public interface SongServiceClient {
 
-    @PostMapping
+    @PostMapping("/api/songs")
     CreateSongMetadataResponse createSongMetaData(@RequestBody SongMetadataDTO dto);
 }
