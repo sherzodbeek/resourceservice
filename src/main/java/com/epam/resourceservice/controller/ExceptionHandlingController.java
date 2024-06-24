@@ -1,7 +1,6 @@
 package com.epam.resourceservice.controller;
 
 import com.epam.resourceservice.exception.ResourceNotFoundException;
-import com.epam.resourceservice.exception.SongServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +34,4 @@ public class ExceptionHandlingController {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
-
-    @ExceptionHandler(SongServiceException.class)
-    public ResponseEntity<String> invalidFileType(SongServiceException ex) {
-        log.error("SongService error response: {}", ex.getMessage());
-        return ResponseEntity
-                .status(ex.getStatus())
-                .body(ex.getResponse());
-    }
-
 }
