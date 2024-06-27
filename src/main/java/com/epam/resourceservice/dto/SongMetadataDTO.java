@@ -9,8 +9,8 @@ public class SongMetadataDTO {
 
     private String name;
     private String artist;
-    private String album;
-    private String length;
-    private Integer resourceId;
-    private String year;
+
+    public String getFullName() {
+        return this.artist + " - " + this.name + ".mp3";
+    }
 }

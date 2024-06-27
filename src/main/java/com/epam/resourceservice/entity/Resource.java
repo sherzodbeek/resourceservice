@@ -19,14 +19,12 @@ public class Resource {
     @Column(name = "name")
     String name;
 
-    @Lob
-    @Column(name = "content")
-    byte[] content;
+    @Column(name = "path")
+    String path;
 
-
-    public Resource(String name, byte[] content) {
+    public Resource(String name, String path) {
         this.name = name;
-        this.content = content;
+        this.path = path;
     }
 }
 
