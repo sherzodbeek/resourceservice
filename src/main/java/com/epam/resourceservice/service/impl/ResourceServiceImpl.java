@@ -20,6 +20,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.xml.sax.ContentHandler;
@@ -40,14 +41,19 @@ public class ResourceServiceImpl implements ResourceService {
     @Value("${config.aws.s3.bucket-name}")
     private String bucketName;
 
+    @Value("${resource.processor.queue}")
+    private String RESOURCE_PROCESSOR_QUEUE;
+
     private static final String AUDIO_FILE_TYPE = "audio/mpeg";
 
     private final ResourceRepository resourceRepository;
     private final AmazonS3Service s3Service;
+    private final RabbitTemplate rabbitTemplate;
 
-    public ResourceServiceImpl(ResourceRepository resourceRepository, AmazonS3Service s3Service) {
+    public ResourceServiceImpl(ResourceRepository resourceRepository, AmazonS3Service s3Service, RabbitTemplate rabbitTemplate) {
         this.resourceRepository = resourceRepository;
         this.s3Service = s3Service;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -69,6 +75,9 @@ public class ResourceServiceImpl implements ResourceService {
         s3Service.upload(bucketName, path, objectMetadata, new ByteArrayInputStream(file));
 
         Resource savedResource = resourceRepository.save(new Resource(songMetadata.getFullName(), path));
+
+        // send to queue
+        rabbitTemplate.convertAndSend(RESOURCE_PROCESSOR_QUEUE, savedResource.getId());
 
         return new UploadedFileDTO(savedResource.getId());
     }
