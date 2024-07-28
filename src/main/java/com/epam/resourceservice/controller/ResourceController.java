@@ -7,6 +7,7 @@ import com.epam.resourceservice.service.ResourceService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class ResourceController {
     @PostMapping(consumes = "audio/mpeg")
     public ResponseEntity<UploadedFileDTO> uploadFile(@RequestBody byte[] file) {
         UploadedFileDTO upload = service.upload(file);
-        return ResponseEntity.ok(upload);
+        return new ResponseEntity<>(upload, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
