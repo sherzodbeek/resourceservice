@@ -28,6 +28,7 @@ services:
       - spring.rabbitmq.listener.simple.retry.multiplier=2
       - resource.processor.queue=$RESOURCE_QUEUE
       - resource.processor.dl.queue=$RESOURCE_DL_QUEUE
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka/
     ports:
       - $RESOURCE_SERVICE_LOCAL_PORT:$RESOURCE_SERVICE_DOCKER_PORT
     networks:
@@ -36,15 +37,18 @@ services:
   songservice:
     build:
       context: ./songservice
-    container_name: songservice
     depends_on:
       - songservicedb
       - localstack
+    deploy:
+      mode: replicated
+      replicas: 2
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://songservicedb:$SONG_SERVICE_PORT/$SONG_SERVICE_DB
       - SPRING_DATASOURCE_USERNAME=$SONG_SERVICE_DB_USER
       - SPRING_DATASOURCE_PASSWORD=$SONG_SERVICE_DB_PASSWORD
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka/
     ports:
       - $SONG_SERVICE_LOCAL_PORT:$SONG_SERVICE_DOCKER_PORT
     networks:
@@ -72,14 +76,14 @@ services:
     networks:
       - app-network
 
-#  eurekaserver:
-#    build:
-#      context: ./eurekaserver
-#    container_name: eurekaserver
-#    ports:
-#      - $EUREKA_SERVER_LOCAL_PORT:$EUREKA_SERVER_DOCKER_PORT
-#    networks:
-#      - app-network
+  eurekaserver:
+    build:
+      context: ./eurekaserver
+    container_name: eurekaserver
+    ports:
+      - $EUREKA_SERVER_LOCAL_PORT:$EUREKA_SERVER_DOCKER_PORT
+    networks:
+      - app-network
 
   localstack:
     container_name: localstack
@@ -124,6 +128,7 @@ services:
       - spring.rabbitmq.listener.simple.retry.max-interval=10s
       - spring.rabbitmq.listener.simple.retry.multiplier=2
       - resource.processor.queue=uploaded-resource-queue
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka/
     networks:
       - app-network
 
