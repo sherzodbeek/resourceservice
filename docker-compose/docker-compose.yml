@@ -85,6 +85,20 @@ services:
     networks:
       - app-network
 
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    depends_on:
+      - resourceservice
+      - eurekaserver
+    ports:
+      - $API_GATEWAY_LOCAL_PORT:$API_GATEWAY_DOCKER_PORT
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8761/eureka/
+    networks:
+      - app-network
+
   localstack:
     container_name: localstack
     image: localstack/localstack:s3-latest
@@ -116,6 +130,7 @@ services:
     environment:
       - song.service.url=$SONG_SERVICE_URL
       - song.service.name=song-service
+      - gateway.url=http://gateway:8080
       - resource.service.url=$RESOURCE_SERVICE_URL
       - resource.service.name=resource-service
       - spring.rabbitmq.host=$RABBIT_MQ_HOST
